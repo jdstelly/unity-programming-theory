@@ -93,7 +93,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 3814406614124629399}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
@@ -191,7 +191,7 @@ BoxCollider:
   m_GameObject: {fileID: 3814406614544342203}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -288,7 +288,7 @@ SphereCollider:
   m_GameObject: {fileID: 3814406614830159765}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -385,7 +385,7 @@ BoxCollider:
   m_GameObject: {fileID: 3814406615259978942}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -482,7 +482,7 @@ BoxCollider:
   m_GameObject: {fileID: 3814406615558341429}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -536,6 +536,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d283c661126167458c991e7a1833336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  age: 0
+  growthRate: 0
+  lifeSpan: 0
+  reproductionRate: 0
+  size: 0
+  caloricBase: 0
+  calories: 0
+  moveSpeed: 0
+  metabolism: 0
+  satiety: 0
+  health: 0
+  perception: 0
+  isMoving: 0
+  diet: 
+  targetEntity: {fileID: 0}
 --- !u!65 &3814406615637796886
 BoxCollider:
   m_ObjectHideFlags: 0

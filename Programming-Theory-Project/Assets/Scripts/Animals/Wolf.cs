@@ -9,7 +9,7 @@ public class Wolf : Animal
     {
         size = 1.5f;
         age = 0.0f;
-        lifeSpan = 300.0f;
+        lifeSpan = 1800.0f;
         caloricBase = 200.0f;
         calories = 200.0f;
         moveSpeed = 10.0f;
@@ -17,6 +17,7 @@ public class Wolf : Animal
         health = 50.0f;
         metabolism = 1.2f;
         perception = 30.0f;
+        diet = "Rabbit";
     }
 
     // Update is called once per frame

@@ -13,10 +13,11 @@ public class Rabbit : Animal
         caloricBase = 100.0f;
         calories = 100.0f;
         moveSpeed = 10.0f;
-        satiety = 50.0f;
+        satiety = 100.0f;
         health = 50.0f;
         metabolism = 1.0f;
         perception = 15.0f;
+        diet = "Carrot";
     }
 
     // Update is called once per frame

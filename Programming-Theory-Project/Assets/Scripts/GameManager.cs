@@ -28,7 +28,10 @@ public class GameManager : MonoBehaviour
         gameTime = 0.0f;
         gameSpeed = 1.0f;
         groveBound = 360.0f;
+        //Instantiate(organisms[0], new Vector3(5, 1, 0), organisms[0].transform.rotation);
         //Instantiate(organisms[1], new Vector3(0, 1, 0), organisms[1].transform.rotation);
+        Instantiate(organisms[1], new Vector3(-5, 1, -5), organisms[1].transform.rotation);
+        Instantiate(organisms[1], new Vector3(5, 1, 5), organisms[1].transform.rotation);
     }
 
     // Update is called once per frame
