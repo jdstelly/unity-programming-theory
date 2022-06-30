@@ -8,6 +8,7 @@ public class Animal : Organism
     public float metabolism;
     public float satiety;
     public float health;
+    public float perception;
     public bool isMeandering;
     public Dictionary<string, Vector3> geoPoints = new Dictionary<string, Vector3>();
     public Dictionary<string, float> animalState = new Dictionary<string, float>();
@@ -20,27 +21,36 @@ public class Animal : Organism
     // Start is called before the first frame update
     void Start()
     {
-        //InitializeAnimal();
+        
     }
 
     // Update is called once per frame
     protected override void Update()
     {
+        // Organism Update (Old age causes death)
+        base.Update();
+
         // If an Animal starves, it dies.
         if (satiety <= 0)
         {
             Die();
         }
 
-        // DEBUG
-        Wander();
-        Debug.Log("Animal Update");
+        // If an Animal's needs are generally met, it idly wanders.
+        if (satiety > 50.0f && satiety <= 90.0f)
+        {
+            Wander();
+        }
 
-        // Organism Update
-        base.Update();
+        // If an Animal is hungry, it searches for food.
+        if (satiety < 50.0f)
+        {
+            Search("food");
+        }
+
     }
 
-    // If an Animal dies, Nature magically turns its body into Carrots.
+    // When an Animal dies, Nature magically turns its body into Carrots.
     protected override void Die()
     {
         // Calculate amount of carrots to spawn on death from creature's base calories.
@@ -52,7 +62,7 @@ public class Animal : Organism
             // Generate carrot spawn point.
             Vector3 spawnPoint = new Vector3(
                 transform.position.x + Random.Range(-4.0f, 4.0f),
-                transform.position.y,
+                transform.position.y - 1,
                 transform.position.z + Random.Range(-4.0f, 4.0f)
             );
 
@@ -64,7 +74,7 @@ public class Animal : Organism
         base.Die();
     }
 
-    // When an animal isn't dying, it might just be wandering.
+    // When an Animal is wandering, it periodically meanders.
     protected void Wander()
     {
         if (!isMeandering)
@@ -75,14 +85,15 @@ public class Animal : Organism
                 isMeandering = Random.Range(1, 100) > 90;
                 if (isMeandering)
                 {
+                    
                     // Generate location to meander to.
                     geoPoints["actionPoint"] = new Vector3
                     (
-                        transform.position.x + Random.Range(-6.0f, 6.0f),
+                        transform.position.x + Random.Range(-16.0f, 16.0f),
                         transform.position.y,
-                        transform.position.z + Random.Range(-6.0f, 6.0f)
+                        transform.position.z + Random.Range(-16.0f, 16.0f)
                     );
-                    Debug.Log($"Meandering activated. Destination is:{geoPoints["actionPoint"]}");
+                    //Debug.Log($"Meandering activated. Destination is:{geoPoints["actionPoint"]}");
                 }
             } else
             {
@@ -93,26 +104,31 @@ public class Animal : Organism
             isMeandering = GoTo(geoPoints["actionPoint"]);
             if (!isMeandering)
             {
-                animalState["meanderCooldown"] = 50.0f;
+                animalState["meanderCooldown"] = 5.0f;
             }
         }
     }
 
+    // When an Animal searches, it moves to a random point in search for a need within perception radius.
+    protected void Search(string need)
+    {
+
+    }
+
+    // When an Animal eats, it moves to and destroys the target object.
     protected void eat(string target)
     {
 
     }
 
+    // When an Animal mates, it moves to the target Animal and a similar Animal instance is created.
     protected void mate(string target)
     {
 
     }
 
-    protected void search(string need)
-    {
 
-    }
-
+    // When an Animal migrates, it moves to a random point on the edge of the map, then destroys itself.
     protected void migrate()
     {
 
@@ -120,7 +136,6 @@ public class Animal : Organism
 
     protected void InitializeAnimal()
     {
-        Debug.Log("Initialized animal");
         geoPoints.Add("spawnPoint", Vector3.zero);
         geoPoints.Add("actionPoint", Vector3.zero);
         animalState.Add("meanderCooldown", 0);
@@ -128,15 +143,13 @@ public class Animal : Organism
 
     protected bool GoTo(Vector3 destination)
     {
-        Debug.Log($"Moving to {destination}");
-        if (Vector3.Distance(transform.position, destination) > 1.0f)
+        //Debug.Log($"Moving Object {name} to {destination} from {transform.position}");
+        if (Vector3.Distance(transform.position, destination) > 0.5f)
         {
-            Debug.Log($"Not yet at {destination} from {transform.position} (distance: {Vector3.Distance(transform.position, destination)})");
-            Vector3 travelVector = (destination - transform.position).normalized;
-            transform.Translate(travelVector * moveSpeed * Time.deltaTime);
+            transform.LookAt(geoPoints["actionPoint"]);
+            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
             return true;
         }
-        Debug.Log($"Arrived at destination {destination}!");
         return false;
     }
 }

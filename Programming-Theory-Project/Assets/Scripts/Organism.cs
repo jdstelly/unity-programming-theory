@@ -30,6 +30,6 @@ public abstract class Organism : MonoBehaviour
 
     protected virtual void Die()
     {
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

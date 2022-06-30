@@ -16,6 +16,7 @@ public class Wolf : Animal
         satiety = 50.0f;
         health = 50.0f;
         metabolism = 1.2f;
+        perception = 30.0f;
     }
 
     // Update is called once per frame

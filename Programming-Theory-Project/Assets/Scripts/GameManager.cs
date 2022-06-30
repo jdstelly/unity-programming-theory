@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public List<GameObject> organisms = new List<GameObject>();
     private float gameTime;
     private float gameSpeed;
+    public float groveBound { get; private set; }
+
 
     private void Awake()
     {
@@ -25,8 +27,8 @@ public class GameManager : MonoBehaviour
     {
         gameTime = 0.0f;
         gameSpeed = 1.0f;
-        Debug.Log("GameManager Start()");
-        Instantiate(organisms[1], new Vector3(550, 12, 520), organisms[1].transform.rotation);
+        groveBound = 360.0f;
+        //Instantiate(organisms[1], new Vector3(0, 1, 0), organisms[1].transform.rotation);
     }
 
     // Update is called once per frame
