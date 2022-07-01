@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\Animals\Animal.cs" />
     <Compile Include="Assets\Scripts\Animals\Rabbit.cs" />
     <Compile Include="Assets\Scripts\Organism.cs" />
+    <Compile Include="Assets\PlayerController.cs" />
     <Compile Include="Assets\Scripts\MenuManager.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Plants\Carrot.cs" />

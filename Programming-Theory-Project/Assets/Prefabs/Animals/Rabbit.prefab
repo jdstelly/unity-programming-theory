@@ -402,7 +402,7 @@ GameObject:
   - component: {fileID: 2740237865366021486}
   m_Layer: 0
   m_Name: Rabbit
-  m_TagString: Untagged
+  m_TagString: rabbit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -461,8 +461,10 @@ MonoBehaviour:
   moveSpeed: 0
   metabolism: 0
   satiety: 0
+  calorieMax: 0
   health: 0
   perception: 0
   isMoving: 0
+  isMigrating: 0
   diet: 
   targetEntity: {fileID: 0}

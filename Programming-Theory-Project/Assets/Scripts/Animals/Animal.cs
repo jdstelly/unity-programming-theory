@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// INHERITANCE
 public class Animal : Organism
 {
     public float moveSpeed;
     public float metabolism;
     public float satiety;
+    public float calorieMax;
     public float health;
     public float perception;
     public bool isMoving;
@@ -16,57 +18,43 @@ public class Animal : Organism
     public Dictionary<string, Vector3> geoPoints = new Dictionary<string, Vector3>();
     public Dictionary<string, float> animalState = new Dictionary<string, float>();
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         InitializeAnimal();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        // Record birthplace
-        geoPoints["spawnPoint"] = transform.position;
+        
     }
 
-    // Update is called once per frame
+    // POLYMORPHISM
     protected override void Update()
     {
-        // Organism Update (Old age causes death)
-        base.Update();
-
-        // If an Animal starves, it dies.
-        if (satiety <= 0)
+        // If an Animal starves or gets too old, it dies.
+        if (satiety <= 0 || age > lifeSpan) Die();
+        
+        // Time passes, Animal gets older.
+        if (canAge)
         {
-            Die();
+            StartCoroutine(Age());
+            canAge = false;
         }
         
         // Animal Behavior
         AnimalBrain();
+
     }
 
     // Animal Behavior Function
+    // ABSTRACTION
     protected void AnimalBrain()
     {
-        // If an Animal's needs are generally met, it idly wanders.
-        if (satiety >= 50.0f && satiety < 90.0f)
-        {
-            if (health > 20.0f)
-            {
-                Wander();
-            } else
-            {
-                // If an animal is in poor health (often starving), it migrates to another area.
-                if (!isMigrating)
-                {
-                    geoPoints["actionPoint"] = GenerateMigrationPoint();
-                    isMigrating = true;
-                }
-                Migrate();
-            }
-        }
 
         // If an Animal is hungry, it searches for food.
-        if (satiety < 50.0f)
+        if (satiety < 90.0f)
         {
             if (targetEntity == null)
             {
@@ -92,10 +80,11 @@ public class Animal : Organism
     }
 
     // When an Animal dies, Nature magically turns its body into Carrots.
+    // POLYMORPHISM
     protected override void Die()
     {
         // Calculate amount of carrots to spawn on death from creature's base calories.
-        int deathSpawns = Mathf.RoundToInt(caloricBase / 25.0f);
+        int deathSpawns = Mathf.RoundToInt(caloricBase / 50.0f);
 
         // Spawn the carrots near the point of death.
         for (int i = 0; i < deathSpawns; i++)
@@ -111,7 +100,7 @@ public class Animal : Organism
             Instantiate(GameManager.instance.organisms[0], spawnPoint, GameManager.instance.organisms[0].transform.rotation);
         }
 
-        // Organism Death
+        // Organism Death (destruction)
         base.Die();
     }
 
@@ -138,14 +127,14 @@ public class Animal : Organism
                 }
             } else
             {
-                animalState["moveCooldown"] -= 0.01f;
+                animalState["moveCooldown"] -= (0.01f * GameManager.instance.gameSpeed);
             }
         } else
         {
             isMoving = GoTo(geoPoints["actionPoint"]);
             if (!isMoving)
             {
-                animalState["moveCooldown"] = 5.0f;
+                animalState["moveCooldown"] = Random.Range(2.0f, 5.0f);
             }
         }
 
@@ -157,8 +146,9 @@ public class Animal : Organism
             case "eat":
                 string searchTarget = (goal == "eat" ? diet : gameObject.name);
                 // Generate a sphere to detect entity colliders.
-                Debug.Log($"{gameObject.name} is searching for {searchTarget} to {goal}.");
+                //Debug.Log($"{gameObject.name} is searching for {searchTarget} to {goal}.");
                 Collider[] detectedEntities = Physics.OverlapSphere(transform.position, perception);
+                List<GameObject> validEntities = new List<GameObject>();
                 foreach (Collider entity in detectedEntities)
                 {
                     GameObject thisEntity = entity.gameObject;
@@ -167,14 +157,15 @@ public class Animal : Organism
                         || thisEntity == gameObject)
                     {
                         // ..skip this entity.
-                        Debug.Log($"{thisEntity.name} is not a good target. SKIPPING");
+                        //Debug.Log($"{thisEntity.name} is not a good target. SKIPPING");
                         continue;
                     }
-                    // Otherwise, this entity meets our goal. Mark target for action and end search.
-                    targetEntity = thisEntity;
-                    Debug.Log($"{thisEntity.name} is going to {goal} {targetEntity.name}! ");
-                    break;
+                    // Otherwise, this entity meets our goal. Mark target as valid.
+                    validEntities.Add(thisEntity);
+                    //Debug.Log($"{thisEntity.name} is going to {goal} {targetEntity.name}! ");
+                    
                 }
+                if (validEntities.Count > 0) targetEntity = validEntities[Random.Range(0, validEntities.Count - 1)];
                 break;
             // Wandering has no evident purpose.
             case "wander":
@@ -187,14 +178,24 @@ public class Animal : Organism
     protected void Eat(GameObject target)
     {
         //Debug.Log($"Eating {target.name}!");
-        if (!GoTo(target.transform.position))
+        // If we've reached the target entity and they still exist (haven't died or been eaten), then proceed.
+        Vector3 targetPosition = new Vector3(
+            target.transform.position.x,
+            transform.position.y,
+            target.transform.position.z
+        );
+        if (!GoTo(targetPosition))
         {
             //Debug.Log($"{target.name} has been eaten! NOM NOM NOM");
-            float targetCalories = target.GetComponent<Organism>().calories;
-            satiety += targetCalories;
-            Debug.Log($"{target.name} eaten by {gameObject.name} for {targetCalories} calories!");
-            Destroy(target);
-            targetEntity = null;
+            if (targetEntity)
+            {
+                float targetCalories = target.GetComponent<Organism>().calories;
+                calories += targetCalories;
+                satiety = ((calories - caloricBase) / (calorieMax - caloricBase)) * 100;
+                //Debug.Log($"{target.name} eaten by {gameObject.name} for {targetCalories} calories!");
+                Destroy(target);
+                targetEntity = null;
+            }
         }
     }
 
@@ -202,18 +203,23 @@ public class Animal : Organism
     protected void Mate(GameObject target)
     {
         //Debug.Log($"Mating with {target.name}");
+        // If we've reached the target entity and they still exist (haven't died or been eaten), then proceed.
         if (!GoTo(target.transform.position))
         {
             //Debug.Log($"{target.name} and {gameObject.name} made a baby!");
-            satiety -= caloricBase;
-            Vector3 spawnPoint = new Vector3(
-                gameObject.transform.position.x + Random.Range(-2.5f, 2.5f),
-                gameObject.transform.position.y,
-                gameObject.transform.position.z + Random.Range(-2.5f, 2.5f)
-            );
-            int breedIndex = (gameObject.name.Contains("Rabbit") ? 1 : 2);
-            Instantiate(GameManager.instance.organisms[breedIndex], spawnPoint, GameManager.instance.organisms[breedIndex].transform.rotation);
-            targetEntity = null;
+            if (targetEntity.name.Contains(gameObject.name))
+            {
+                calories -= (caloricBase * 2);
+                satiety = ((calories - caloricBase) / (calorieMax - caloricBase)) * 100;
+                Vector3 spawnPoint = new Vector3(
+                    gameObject.transform.position.x + Random.Range(-2.5f, 2.5f),
+                    gameObject.transform.position.y,
+                    gameObject.transform.position.z + Random.Range(-2.5f, 2.5f)
+                );
+                int breedIndex = (gameObject.name.Contains("Rabbit") ? 1 : 2);
+                Instantiate(GameManager.instance.organisms[breedIndex], spawnPoint, GameManager.instance.organisms[breedIndex].transform.rotation);
+                targetEntity = null;
+            }
         }
     }
 
@@ -227,14 +233,27 @@ public class Animal : Organism
         }
     }
 
+    protected override IEnumerator Age()
+    {
+        yield return new WaitForSeconds(1 / GameManager.instance.gameSpeed);
+        age += 1.0f;
+        calories -= metabolism * 0.5f;
+        satiety = ((calories - caloricBase) / (calorieMax - caloricBase)) * 100;
+        canAge = true;
+        //Debug.Log($"{gameObject.name} calories:{calories}");
+    }
+
     // ================
     // HELPER FUNCTIONS
     // ================
     protected void InitializeAnimal()
     {
+        //Debug.Log(canAge);
         geoPoints.Add("spawnPoint", Vector3.zero);
         geoPoints.Add("actionPoint", Vector3.zero);
         animalState.Add("moveCooldown", 0);
+        // Record birthplace
+        geoPoints["spawnPoint"] = transform.position;
     }
 
     protected Vector3 GenerateNavPoint(float navRadius)
@@ -284,7 +303,7 @@ public class Animal : Organism
         if (Vector3.Distance(transform.position, destination) > 0.5f)
         {
             transform.LookAt(destination);
-            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+            transform.Translate(Vector3.forward * (moveSpeed * GameManager.instance.gameSpeed) * Time.deltaTime);
             return true;
         }
         return false;

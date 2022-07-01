@@ -11,25 +11,38 @@ public abstract class Organism : MonoBehaviour
     public float size;
     public float caloricBase;
     public float calories;
+    protected bool canAge;
+
+    protected virtual void Awake()
+    {
+        canAge = true;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
     protected virtual void Update()
     {
-        // If an Organism outlives its lifespan, it dies.
-        if (age >= lifeSpan)
+        if (canAge)
         {
-            Die();
+            canAge = false;
+            StartCoroutine(Age());
         }
     }
 
     protected virtual void Die()
     {
         Destroy(gameObject);
+    }
+
+    protected virtual IEnumerator Age()
+    {
+        yield return new WaitForSeconds(1 / GameManager.instance.gameSpeed);
+        age += (1.0f);
+        canAge = true;
     }
 }

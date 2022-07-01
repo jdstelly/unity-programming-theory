@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 345114356233839361}
   m_Layer: 0
   m_Name: Carrot
-  m_TagString: Untagged
+  m_TagString: carrot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 5006888139013183894}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 586.28564, y: 9, z: 505.9948}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1236014016487010749}
