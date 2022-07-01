@@ -29,9 +29,9 @@ public class GameManager : MonoBehaviour
         gameSpeed = 1.0f;
         groveBound = 360.0f;
         //Instantiate(organisms[0], new Vector3(5, 1, 0), organisms[0].transform.rotation);
-        //Instantiate(organisms[1], new Vector3(0, 1, 0), organisms[1].transform.rotation);
-        Instantiate(organisms[1], new Vector3(-5, 1, -5), organisms[1].transform.rotation);
-        Instantiate(organisms[1], new Vector3(5, 1, 5), organisms[1].transform.rotation);
+        GenerateOrganisms(1, 10, 15);
+        GenerateOrganisms(2, 1, 5);
+
     }
 
     // Update is called once per frame
@@ -43,5 +43,15 @@ public class GameManager : MonoBehaviour
     void ProgressTime()
     {
         gameTime += 0.1f * gameSpeed;
+    }
+
+    void GenerateOrganisms(int organismIndex, int amount, float radius)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            float xPos = Random.Range(-radius, radius);
+            float zPos = Random.Range(-radius, radius);
+            Instantiate(organisms[organismIndex], new Vector3(xPos, 1, zPos), organisms[organismIndex].transform.rotation);
+        }
     }
 }

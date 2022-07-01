@@ -12,8 +12,8 @@ public class Wolf : Animal
         lifeSpan = 1800.0f;
         caloricBase = 200.0f;
         calories = 200.0f;
-        moveSpeed = 10.0f;
-        satiety = 50.0f;
+        moveSpeed = 20.0f;
+        satiety = 30.0f;
         health = 50.0f;
         metabolism = 1.2f;
         perception = 30.0f;

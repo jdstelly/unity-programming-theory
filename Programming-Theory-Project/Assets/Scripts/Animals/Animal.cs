@@ -10,8 +10,9 @@ public class Animal : Organism
     public float health;
     public float perception;
     public bool isMoving;
+    public bool isMigrating;
     public string diet;
-    public GameObject targetEntity;
+    public GameObject targetEntity = null;
     public Dictionary<string, Vector3> geoPoints = new Dictionary<string, Vector3>();
     public Dictionary<string, float> animalState = new Dictionary<string, float>();
 
@@ -23,7 +24,8 @@ public class Animal : Organism
     // Start is called before the first frame update
     void Start()
     {
-        
+        // Record birthplace
+        geoPoints["spawnPoint"] = transform.position;
     }
 
     // Update is called once per frame
@@ -37,25 +39,45 @@ public class Animal : Organism
         {
             Die();
         }
+        
+        // Animal Behavior
+        AnimalBrain();
+    }
 
-        // ..and that Animal's needs are generally met, it idly wanders.
+    // Animal Behavior Function
+    protected void AnimalBrain()
+    {
+        // If an Animal's needs are generally met, it idly wanders.
         if (satiety >= 50.0f && satiety < 90.0f)
         {
-            Wander();
+            if (health > 20.0f)
+            {
+                Wander();
+            } else
+            {
+                // If an animal is in poor health (often starving), it migrates to another area.
+                if (!isMigrating)
+                {
+                    geoPoints["actionPoint"] = GenerateMigrationPoint();
+                    isMigrating = true;
+                }
+                Migrate();
+            }
         }
 
-        // ..and that Animal is hungry, it searches for food.
+        // If an Animal is hungry, it searches for food.
         if (satiety < 50.0f)
         {
             if (targetEntity == null)
             {
-                Search("food");
+                Search("eat");
             } else
             {
                 Eat(targetEntity);
             }
         }
 
+        // If an Animal is very well fed, it breeds.
         if (satiety >= 90.0f)
         {
             if (targetEntity == null)
@@ -132,9 +154,10 @@ public class Animal : Organism
         {
             // Search for food or mate.
             case "mate":
-            case "food":
-                string searchTarget = (goal == "food" ? diet : gameObject.name);
+            case "eat":
+                string searchTarget = (goal == "eat" ? diet : gameObject.name);
                 // Generate a sphere to detect entity colliders.
+                Debug.Log($"{gameObject.name} is searching for {searchTarget} to {goal}.");
                 Collider[] detectedEntities = Physics.OverlapSphere(transform.position, perception);
                 foreach (Collider entity in detectedEntities)
                 {
@@ -148,8 +171,8 @@ public class Animal : Organism
                         continue;
                     }
                     // Otherwise, this entity meets our goal. Mark target for action and end search.
-                    Debug.Log($"{thisEntity.name} IS GOOD - TARGET FOUND ****");
                     targetEntity = thisEntity;
+                    Debug.Log($"{thisEntity.name} is going to {goal} {targetEntity.name}! ");
                     break;
                 }
                 break;
@@ -167,33 +190,41 @@ public class Animal : Organism
         if (!GoTo(target.transform.position))
         {
             //Debug.Log($"{target.name} has been eaten! NOM NOM NOM");
-            satiety += 25.0f;
+            float targetCalories = target.GetComponent<Organism>().calories;
+            satiety += targetCalories;
+            Debug.Log($"{target.name} eaten by {gameObject.name} for {targetCalories} calories!");
             Destroy(target);
+            targetEntity = null;
         }
     }
 
     // When an Animal mates, it moves to the target Animal and a similar Animal instance is created.
     protected void Mate(GameObject target)
     {
-        Debug.Log($"Mating with {target.name}");
+        //Debug.Log($"Mating with {target.name}");
         if (!GoTo(target.transform.position))
         {
-            Debug.Log($"{target.name} and {gameObject.name} made a baby!");
+            //Debug.Log($"{target.name} and {gameObject.name} made a baby!");
             satiety -= caloricBase;
             Vector3 spawnPoint = new Vector3(
                 gameObject.transform.position.x + Random.Range(-2.5f, 2.5f),
                 gameObject.transform.position.y,
                 gameObject.transform.position.z + Random.Range(-2.5f, 2.5f)
             );
-            Instantiate(GameManager.instance.organisms[1], spawnPoint, GameManager.instance.organisms[1].transform.rotation);
+            int breedIndex = (gameObject.name.Contains("Rabbit") ? 1 : 2);
+            Instantiate(GameManager.instance.organisms[breedIndex], spawnPoint, GameManager.instance.organisms[breedIndex].transform.rotation);
+            targetEntity = null;
         }
     }
 
-
-    // When an Animal migrates, it moves to a random point on the edge of the map, then destroys itself.
+    // When an Animal migrates, it moves to a random point on the edge of the map and destroys itself.
     protected void Migrate()
     {
-
+        //Debug.Log($"Eating {target.name}!");
+        if (!GoTo(geoPoints["actionPoint"]))
+        {
+            Destroy(gameObject);
+        }
     }
 
     // ================
@@ -224,6 +255,27 @@ public class Animal : Organism
         }
 
         return generatedPoint;
+    }
+
+    protected Vector3 GenerateMigrationPoint()
+    {
+        Vector3 migrationPoint;
+        if (Random.Range(1, 100) > 50)
+        {
+            migrationPoint = new Vector3(
+                ((Random.Range(1, 100) > 50) ? -360 : 360),
+                1,
+                Random.Range(-360, 360)
+            );
+        } else
+        {
+            migrationPoint = new Vector3(
+                Random.Range(-360, 360),
+                1,
+                ((Random.Range(1, 100) > 50) ? -360 : 360)
+            );
+        }
+        return migrationPoint;
     }
 
     protected bool GoTo(Vector3 destination)
