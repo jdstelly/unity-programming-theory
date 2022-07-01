@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public List<GameObject> organisms = new List<GameObject>();
     private float gameTime;
     private float gameSpeed;
+    private bool canSpawnCarrots;
+    private float spawnRateCarrots;
     public float groveBound { get; private set; }
 
 
@@ -28,7 +30,8 @@ public class GameManager : MonoBehaviour
         gameTime = 0.0f;
         gameSpeed = 1.0f;
         groveBound = 360.0f;
-        //Instantiate(organisms[0], new Vector3(5, 1, 0), organisms[0].transform.rotation);
+        canSpawnCarrots = true;
+        spawnRateCarrots = 3.0f;
         GenerateOrganisms(1, 10, 15);
         GenerateOrganisms(2, 1, 5);
 
@@ -38,6 +41,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         //ProgressTime();
+        if (canSpawnCarrots)
+        {
+            StartCoroutine(CarrotGenerator(spawnRateCarrots));
+            canSpawnCarrots = false;
+        }
     }
 
     void ProgressTime()
@@ -54,4 +62,12 @@ public class GameManager : MonoBehaviour
             Instantiate(organisms[organismIndex], new Vector3(xPos, 1, zPos), organisms[organismIndex].transform.rotation);
         }
     }
+
+    IEnumerator CarrotGenerator(float spawnRate)
+    {
+        yield return new WaitForSeconds(spawnRate);
+        GenerateOrganisms(0, 50, 340);
+        canSpawnCarrots = true;
+    }
+
 }
