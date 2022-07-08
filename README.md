@@ -14,9 +14,7 @@ Dead animals return their calories to the soil and grow more carrots.
 
 Basic OOP class inheritance overview:
 
-Organism ---> Plants ---> Carrots
-          \-> Animals ---> Rabbits
-                      \--> Wolves
+![alt text](/../main/unity-programming-theory/OOP_I.png?raw=true "Class Inheritance Tree")
                       
 Plants and Animals inherit methods like "Die()" and "Age()" (lovely, I know) from Organism. 
 Wolf classes and Rabbit classes inherit every method from the Animal class and polymorph through differed variable values.
