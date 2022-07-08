@@ -17,6 +17,6 @@ Basic OOP class inheritance overview:
 ![alt text](https://github.com/jdstelly/unity-programming-theory/blob/main/OOP_I.png?raw=true "Class Inheritance Tree")
                       
 Plants and Animals inherit methods like "Die()" and "Age()" (lovely, I know) from Organism. 
-Wolf classes and Rabbit classes inherit every method from the Animal class and polymorph through differed variable values.
+Wolf classes and Rabbit classes inherit every method from the Animal class (like Eat(), Search(), etc..) and polymorph through differed variable values (movement speed, diet, lifespan).
 
 It was pretty fun to write and took me about 2 days.
