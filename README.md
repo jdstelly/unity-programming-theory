@@ -4,7 +4,9 @@ Unity Jr. Programmer course submission.
 This repo is from my study of the Unity Jr. Programmer course. It's meant to demonstrate an understanding of object oriented programming principles. 
 All of the programming occurs in the ./Programming-Theory-Project/Assets/Scripts/ directory, if you're interested in reviewing the scripts.
 
-The game is a demonstration of natural principles regarding how populations change with available resources.
+You can play with the WebGL build of the demo at https://play.unity.com/mg/other/webgl-builds-216351.
+
+The "game" is a demonstration of natural principles regarding how populations change with available resources.
 Carrots grow over time and seed more carrots if they aren't eaten. 
 Rabbits eat carrots and reproduce. 
 Wolves eat Rabbits and reproduce. 
